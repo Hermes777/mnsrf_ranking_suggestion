@@ -11,8 +11,8 @@ The proposed model to suggest queries is shown below.
 <p align="justify">
 
 <p align="center">
-<br><br>
+<br>
 <img src="http://i.imgur.com/qodsqRM.png" width="90%">
-<br><br>
+<br>
 Figure: Attentive sequence-to-sequence learning for query suggestion
 <p align="center">

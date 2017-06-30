@@ -11,9 +11,9 @@ Proposed hierarchical recurrent encoder-decoder architecture is shown below.
 <p align="justify">
 
 <p align="center">
-<br><br>
+<br>
 <img src="https://ai2-s2-public.s3.amazonaws.com/figures/2016-11-08/00f31994c123fbceba5d5a0e06bb78aff651aae7/3-Figure3-1.png" width="90%">
-<br><br>
+<br>
 <p align="center">
 
 <p align="justify">
