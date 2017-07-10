@@ -19,7 +19,7 @@ def get_args():
                         help='use bidirectional recurrent unit')
     parser.add_argument('--emsize', type=int, default=300,
                         help='size of word embeddings')
-    parser.add_argument('--nhid', type=int, default=1024,
+    parser.add_argument('--nhid', type=int, default=512,
                         help='number of hidden units per layer for encoder/decoder')
     parser.add_argument('--nlayers', type=int, default=1,
                         help='number of layers')
