@@ -19,17 +19,19 @@ def get_args():
                         help='use bidirectional recurrent unit')
     parser.add_argument('--emsize', type=int, default=300,
                         help='size of word embeddings')
-    parser.add_argument('--nhid', type=int, default=300,
-                        help='number of hidden units per layer')
+    parser.add_argument('--nhid_query', type=int, default=512,
+                        help='number of hidden units per layer for query encoder')
+    parser.add_argument('--nhid_session', type=int, default=1024,
+                        help='number of hidden units per layer for session encoder')
     parser.add_argument('--nlayers', type=int, default=1,
                         help='number of layers')
-    parser.add_argument('--lr', type=float, default=.001,
+    parser.add_argument('--lr', type=float, default=.0001,
                         help='initial learning rate')
     parser.add_argument('--lr_decay', type=float, default=.5,
                         help='decay ratio for learning rate')
-    parser.add_argument('--clip', type=float, default=5.0,
+    parser.add_argument('--clip', type=float, default=1.0,
                         help='gradient clipping')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=300,
                         help='upper limit of epoch')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')

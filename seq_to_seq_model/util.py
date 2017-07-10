@@ -19,8 +19,8 @@ def get_args():
                         help='use bidirectional recurrent unit')
     parser.add_argument('--emsize', type=int, default=300,
                         help='size of word embeddings')
-    parser.add_argument('--nhid', type=int, default=300,
-                        help='number of hidden units per layer')
+    parser.add_argument('--nhid', type=int, default=1024,
+                        help='number of hidden units per layer for encoder/decoder')
     parser.add_argument('--nlayers', type=int, default=1,
                         help='number of layers')
     parser.add_argument('--lr', type=float, default=.001,
@@ -35,7 +35,7 @@ def get_args():
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--batch_size', type=int, default=512, metavar='N',
                         help='batch size')
-    parser.add_argument('--dropout', type=float, default=0.25,
+    parser.add_argument('--dropout', type=float, default=0.1,
                         help='dropout applied to layers (0 = no dropout)')
     parser.add_argument('--max_length', type=int, default=10,
                         help='maximum length of a query')

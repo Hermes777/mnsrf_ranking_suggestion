@@ -6,7 +6,7 @@
 # File Description: This script contains code to train the model.
 ###############################################################################
 
-import time, helper, torch
+import time, helper, torch, numpy
 
 import torch.nn as nn
 from torch.nn.utils import clip_grad_norm
@@ -101,7 +101,7 @@ class Train:
                 else:
                     self.times_no_improvement += 1
                     # no improvement in validation loss for last n times, so stop training
-                    if self.times_no_improvement == 20:
+                    if self.times_no_improvement == 10:
                         self.stop = True
                         break
 

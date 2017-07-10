@@ -6,13 +6,14 @@
 # File Description: This script is the entry point of the entire pipeline.
 ###############################################################################
 
-import util, helper, data, train, os
+import util, helper, data, train, os, numpy
 import torch
 from torch import optim
 from seq2seq import Sequence2Sequence
 
 args = util.get_args()
 # Set the random seed manually for reproducibility.
+numpy.random.seed(args.seed)
 torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     if not args.cuda:
@@ -27,10 +28,8 @@ if torch.cuda.is_available():
 dictionary = data.Dictionary()
 train_corpus = data.Corpus(args.data, 'session_train.txt', dictionary, args.max_length)
 dev_corpus = data.Corpus(args.data, 'session_dev.txt', dictionary, args.max_length)
-# test_corpus = data.Corpus(args.data, 'session_test.txt', dictionary, args.max_length, is_test_corpus=True)
 print('Train set size = ', len(train_corpus.data))
 print('Dev set size = ', len(dev_corpus.data))
-# print('Test set size = ', len(test_corpus.data))
 print('Vocabulary size = ', len(dictionary))
 
 # save the dictionary object to use during testing
@@ -56,10 +55,11 @@ model = Sequence2Sequence(dictionary, embeddings_index, args)
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), args.lr)
 best_loss = -1
 
-# for training on multiple GPUs. use CUDA_VISIBLE_DEVICES=0,1 to specify which GPUs to use
-# if 'CUDA_VISIBLE_DEVICES' in os.environ:
-#     cuda_visible_devices = [int(x) for x in os.environ['CUDA_VISIBLE_DEVICES'].split(',')]
-#     model = torch.nn.DataParallel(model, device_ids=cuda_visible_devices)
+# for training on multiple GPUs. set multiple GPUs by setting CUDA_VISIBLE_DEVICES, ex., CUDA_VISIBLE_DEVICES=0,1
+if 'CUDA_VISIBLE_DEVICES' in os.environ:
+    cuda_visible_devices = [int(x) for x in os.environ['CUDA_VISIBLE_DEVICES'].split(',')]
+    if len(cuda_visible_devices) > 1:
+        model = torch.nn.DataParallel(model, device_ids=cuda_visible_devices)
 if args.cuda:
     model = model.cuda()
 

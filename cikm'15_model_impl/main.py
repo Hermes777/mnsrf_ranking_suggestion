@@ -27,7 +27,6 @@ if torch.cuda.is_available():
 dictionary = data.Dictionary()
 train_corpus = data.Corpus(args.data, 'session_train.txt', dictionary, args.max_length)
 dev_corpus = data.Corpus(args.data, 'session_dev.txt', dictionary, args.max_length)
-# test_corpus = data.Corpus(args.data, 'session_test.txt', dictionary, args.max_length, is_test_corpus=True)
 print('Train set size = ', len(train_corpus))
 print('Max session length in train corpus = ', train_corpus.max_session_length)
 print('Dev set size = ', len(dev_corpus))
@@ -48,6 +47,9 @@ train_batches = helper.batchify(train_corpus.data, args.batch_size)
 print('Number of train batches = ', len(train_batches))
 dev_batches = helper.batchify(dev_corpus.data, args.batch_size)
 print('Number of dev batches = ', len(dev_batches))
+
+# for session in train_batches[0]:
+#    print(session.queries)
 
 # ###############################################################################
 # # Build the model

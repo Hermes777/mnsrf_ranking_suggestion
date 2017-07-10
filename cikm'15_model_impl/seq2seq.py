@@ -23,26 +23,25 @@ class Sequence2Sequence(nn.Module):
         self.embedding_index = embedding_index
         self.config = args
         self.embedding = EmbeddingLayer(len(self.dictionary), self.config)
-        self.query_encoder = Encoder(self.config)
-        self.session_encoder = Encoder(self.config)
-        self.decoder = Decoder(len(self.dictionary), self.config)
-        self.criterion = nn.NLLLoss()  # Negative log-likelihood loss
+        self.query_encoder = Encoder(self.config.emsize, self.config.nhid_query, self.config)
+        self.session_encoder = Encoder(self.config.nhid_query, self.config.nhid_session, self.config)
+        self.decoder = Decoder(self.config.emsize, self.config.nhid_session, len(self.dictionary), self.config)
 
-        # Initializing the weight parameters for the embedding layer in the encoder and decoder.
+        # Initializing the weight parameters for the embedding layer.
         self.embedding.init_embedding_weights(self.dictionary, self.embedding_index, self.config.emsize)
-        self.decoder.init_embedding_weights(self.dictionary, self.embedding_index, self.config.emsize)
 
     @staticmethod
-    def compute_loss(logits, target, seq_idx, length, regularization_param=None):
+    def compute_loss(logits, target, seq_idx, length):
         # logits: batch x vocab_size, target: batch x 1
         losses = -torch.gather(logits, dim=1, index=target.unsqueeze(1))
         # mask: batch x 1
         mask = helper.mask(length, seq_idx)
         losses = losses * mask.float()
-        loss = losses.mean()
-        if regularization_param:
-            regularized_loss = logits.exp().mul(logits).sum(1).squeeze() * regularization_param
-            loss += regularized_loss.mean()
+        num_non_zero_elem = torch.nonzero(mask.data).size()
+        if not num_non_zero_elem:
+            loss = losses.sum()
+        else:
+            loss = losses.sum() / num_non_zero_elem[0]
         return loss
 
     def forward(self, batch_session, length):
@@ -56,24 +55,27 @@ class Sequence2Sequence(nn.Module):
             output, hidden = self.query_encoder(embedded_input, encoder_hidden)
 
         if self.config.bidirection:
-            hidden = torch.mean(hidden[0], 0), torch.mean(hidden[1], 0)
             output = torch.div(
-                torch.add(output[:, :, 0:self.config.nhid], output[:, :, self.config.nhid:2 * self.config.nhid]), 2)
+                torch.add(output[:, :, 0:self.config.nhid_query],
+                          output[:, :, self.config.nhid_query:2 * self.config.nhid_query]), 2)
 
         session_input = output[:, -1, :].contiguous().view(batch_session.size(0), batch_session.size(1), -1)
         # session level encoding
         sess_hidden = self.session_encoder.init_weights(session_input.size(0))
         hidden_states, cell_states = [], []
         for idx in range(session_input.size(1)):
-            sess_output, sess_hidden = self.session_encoder(session_input, sess_hidden)
+            sess_output, sess_hidden = self.session_encoder(session_input[:, idx, :].unsqueeze(1), sess_hidden)
             if self.config.bidirection:
                 hidden_states.append(torch.mean(sess_hidden[0], 0))
                 cell_states.append(torch.mean(sess_hidden[1], 0))
+            else:
+                hidden_states.append(sess_hidden[0])
+                cell_states.append(sess_hidden[1])
 
-        hidden_states = torch.stack(hidden_states, 0).squeeze(1)
-        cell_states = torch.stack(cell_states, 0).squeeze(1)
-        hidden_states = hidden_states[:-1, :, :].contiguous().view(-1, hidden_states.size(-1)).unsqueeze(0)
-        cell_states = cell_states[:-1, :, :].contiguous().view(-1, cell_states.size(-1)).unsqueeze(0)
+        hidden_states = torch.stack(hidden_states, 2).squeeze(0)
+        cell_states = torch.stack(cell_states, 2).squeeze(0)
+        hidden_states = hidden_states[:, :-1, :].contiguous().view(-1, hidden_states.size(-1)).unsqueeze(0)
+        cell_states = cell_states[:, :-1, :].contiguous().view(-1, cell_states.size(-1)).unsqueeze(0)
 
         decoder_input = batch_session[:, 1:, :].contiguous().view(-1, batch_session.size(-1))
         target_length = length[:, 1:].contiguous().view(-1)
@@ -90,8 +92,9 @@ class Sequence2Sequence(nn.Module):
         for idx in range(decoder_input.size(1)):
             if idx != 0:
                 input_variable = decoder_input[:, idx - 1]
+            embedded_decoder_input = self.embedding(input_variable).unsqueeze(1)
+            decoder_output, decoder_hidden = self.decoder(embedded_decoder_input, decoder_hidden)
             target_variable = decoder_input[:, idx]
-            decoder_output, decoder_hidden = self.decoder(input_variable, decoder_hidden)
             loss += self.compute_loss(decoder_output, target_variable, idx, target_length)
 
         return loss

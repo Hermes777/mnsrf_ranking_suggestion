@@ -7,7 +7,7 @@
 # example in the corpus and the dictionary.
 ###############################################################################
 
-import os, helper
+import os
 
 
 class Dictionary(object):

@@ -48,12 +48,10 @@ class Instance(object):
 
     def add_sentence(self, sentence, sentence_no, dictionary, max_length, is_test_instance=False):
         if sentence_no == 1:
-            # words = helper.tokenize_and_normalize(sentence)
             words = sentence.split() + [dictionary.end_token]
             if len(words) > (max_length + 1):
                 return -1
         else:
-            # words = [dictionary.start_token] + helper.tokenize_and_normalize(sentence) + [dictionary.end_token]
             words = [dictionary.start_token] + sentence.split() + [dictionary.end_token]
             if len(words) > (max_length + 2):
                 return -1
@@ -84,7 +82,6 @@ class Corpus(object):
         assert os.path.exists(path)
 
         samples = []
-        # counter = 0
         with open(path, 'r') as f:
             for line in f:
                 queries = line.strip().split(':::')
@@ -103,9 +100,5 @@ class Corpus(object):
                         self.max_sent_length = length
 
                     samples.append(instance)
-                    # counter += 1
-
-                # if counter >= 512 * 1:
-                # break
 
         return samples

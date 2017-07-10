@@ -103,6 +103,8 @@ class Train:
                         self.stop = True
                         break
 
+                        # break
+
     def validate(self, dev_batches):
         # Turn on evaluation mode which disables dropout.
         self.model.eval()

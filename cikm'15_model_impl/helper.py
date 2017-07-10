@@ -248,7 +248,7 @@ def session_to_tensor(sessions, dictionary):
     for i in range(len(sessions)):
         for j in range(len(sessions[i].queries)):
             session_tensor[i, j] = sentence_to_tensor(sessions[i].queries[j], max_query_length, dictionary)
-            length[i, j] = len(sessions[i].queries[j]) - 1
+            length[i, j] = len(sessions[i].queries[j])
 
     return Variable(session_tensor), Variable(length)
 
