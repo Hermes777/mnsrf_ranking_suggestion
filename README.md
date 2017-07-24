@@ -1,9 +1,7 @@
-# Sequence to sequence learning for generative context-aware query suggestion
+# Intent-aware Neural Click Model for Web Search
 
 <p align="justify">
-If a search engine can understand users' intent and assist them by suggesting queries that are effective in formulating the users' information need, then the search engine can achieve better ranking 
-performance on the submitted queries by the users to imporve overall search effectiveness. In this project, we aim to use sequence-to-sequence learning algorithm to make search engines capable of giving
-context-aware query suggestions to their users.
+If a search engine can understand users' intent and assist them by suggesting queries that are effective in formulating the users' information need, then the search engine can achieve better ranking performance on the submitted queries by the users to imporve overall search effectiveness. In this project, we aim to use sequence-to-sequence learning algorithm to make search engines capable of giving context-aware query suggestions and predict document clicks.
 <p align="justify">
 
 <p align="justify">
